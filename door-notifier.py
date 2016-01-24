@@ -6,7 +6,10 @@ import smtplib
 from email.mime.text import MIMEText
 from config import Config
 
-f = file('door-notifier.cfg')
+__location__ = os.path.realpath(
+    os.path.join(os.getcwd(), os.path.dirname(__file__)))
+
+f = file(os.path.join(__location__, 'door-notifier.cfg'))
 cfg = Config(f)
 
 closed_text = 'garage door is CLOSED'
