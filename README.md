@@ -103,3 +103,10 @@ To run: `python door-notifier.py`
 
 You might be able to run it on a cron, such as `@reboot /path/to/python door-notifier.py > outputfile.txt`
 
+## Notes
+
+So, my cron idea didn't work. It appears that something is funky on the first few runs. Possible calibration is off?
+
+The first time I run `rtl_433 2>&1 -s005000 -A -f 433880000` after booting, I just get gibberish
+
+However, once I run `rtl_433 2>&1 -s250000 -A -f 433880000` and `rtl_433 2>&1 -s005000 -A -f 433880000` a few times, the 5000 sample rate starts to work correctly. Then I can run `python /home/pi/door/door-notifier.py > /home/pi/door/out.txt &`, exit the server and it works as expected.
