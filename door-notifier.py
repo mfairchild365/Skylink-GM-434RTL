@@ -29,10 +29,6 @@ p.kill()
 closed_text = 'garage door is CLOSED'
 open_text = 'garage door is OPEN'
 
-smtp = smtplib.SMTP(cfg.smtp_host)
-smtp.starttls()
-smtp.login(cfg.smtp_user, cfg.smtp_pass)
-
 cmd = 'rtl_433 2>&1 -s'+cfg.sample_rate+' -A -f '+cfg.frequency
 
 print 'running command: ' + cmd
@@ -41,26 +37,27 @@ p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.
 
 last_message = 0
 
+def sendEmail(msg_txt):
+	smtp = smtplib.SMTP(cfg.smtp_host)
+	smtp.starttls()
+        smtp.login(cfg.smtp_user, cfg.smtp_pass)
+        msg = MIMEText(msg_txt);
+        msg['Subject'] = msg_txt
+        msg['From'] = cfg.email_from
+        msg['To'] = cfg.email_to
+        smtp.sendmail(cfg.email_from, [cfg.email_to], msg.as_string())
+	smtp.quit()
+
 while p.poll() is None:
 	out = p.stdout.readline()
 
-	if cfg.closed_code in out and time.time() > last_message+5:
+	if cfg.closed_code in out and time.time() > last_message+2:
 		print time.strftime('%c') + ': CLOSED'
-		msg = MIMEText(closed_text);
-		msg['Subject'] = closed_text
-		msg['From'] = cfg.email_from
-		msg['To'] = cfg.email_to
-		smtp.sendmail(cfg.email_from, [cfg.email_to], msg.as_string())
-
+                sendEmail(closed_text)
 		last_message = time.time()
-	elif cfg.open_code in out and time.time() > last_message+5:
+	elif cfg.open_code in out and time.time() > last_message+2:
 		print time.strftime('%c') + ': OPEN'
-                msg = MIMEText(open_text);
-                msg['Subject'] = open_text 
-                msg['From'] = cfg.email_from
-                msg['To'] = cfg.email_to
-                smtp.sendmail(cfg.email_from, [cfg.email_to], msg.as_string())
-
+		sendEmail(open_text)
 		last_message = time.time()
 
 print 'finished'
