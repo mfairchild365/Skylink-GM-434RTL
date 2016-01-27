@@ -3,6 +3,7 @@ import sys
 import subprocess
 import time
 import smtplib
+import signal
 from email.mime.text import MIMEText
 from config import Config
 
@@ -12,6 +13,19 @@ __location__ = os.path.realpath(
 f = file(os.path.join(__location__, 'door-notifier.cfg'))
 cfg = Config(f)
 
+#We need to start rtl_433 in default mode, then kill it in order for things to calibrate correctly (very odd)
+p = subprocess.Popen('exec rtl_433 -s250000 -A -f '+cfg.frequency, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+#let it run for a little bit
+target_kill = time.time() + 5;
+while p.poll() is None:
+	if time.time() > target_kill:
+		break
+
+#End the sub-process
+p.kill()
+
+#continue with normal application
 closed_text = 'garage door is CLOSED'
 open_text = 'garage door is OPEN'
 
