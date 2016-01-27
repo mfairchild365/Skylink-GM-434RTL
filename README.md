@@ -3,7 +3,7 @@
 ## Summery of project
 This was a weekend project. I already had a Skylink-GM-434RTL installed in my house. For clarification, yes it is a garage door alarm, and yes the only reason why I have it is because I forget to close my garage door ALL THE TIME. The device came with a receiver which will loudly beep until the garage door is closed. Very helpful.
 
-I was curious how the device worked, and I had an amazon gift card to spend along with a spare raspberry Pi 2. Why not hack the device and have it send me a text whenever my garage door opens and closes? Seems simple enough right?
+I was curious how the device worked, and I had ansin amazon gift card to spend along with a spare raspberry Pi 2. Why not hack the device and have it send me a text whenever my garage door opens and closes? Seems simple enough right?
 
 ## My supplies:
 This is all that I used to get this thing working:
@@ -14,7 +14,7 @@ This is all that I used to get this thing working:
 
 
 ## WHAT HAVE I DONE!?
-Going into this, I had absolutely no idea what I was getting into or how any of this stuff worked. This stuff was magic to me. I knew the alarm communicated with the receiver wirelessly, but how!? Well, a quick google search put me in the right direction: radio waves! So, I researched how to get a raspberry pi to detect radio singles and discovered the world of the RTL-SDR, or software defined radios. Basically, you plug a little device into your usb port, run some software, and you can eavesdrop on the radio, TV, your neighbors, a crazy amount of devices, etc. Don't tell the NSA. However, most of this is just noise and super hard to decode.
+Going into this, I had absolutely no idea what I was getting into or how any of this stuff worked. This stuff was magic to me. I knew the alarm communicated with the receiver wirelessly, but how!? Well, a quick google search put me in the right direction: radio waves! So, I researched how to get a raspberry pi to detect radio signals and discovered the world of the RTL-SDR, or software defined radios. Basically, you plug a little device into your usb port, run some software, and you can eavesdrop on the radio, TV, your neighbors, a crazy amount of devices, etc. Don't tell the NSA. However, most of this is just noise and super hard to decode.
 
 ### Finding the frequency
 
@@ -33,7 +33,7 @@ Okay, now I needed to know how to do this pragmatically. I am a programmer by tr
 
 I came up with a few existing projects:
 
-- Freq Show: this is a small program designed for the pi, which uses python libraries show charts and data about radio singles. https://learn.adafruit.com/freq-show-raspberry-pi-rtl-sdr-scanner/installation
+- Freq Show: this is a small program designed for the pi, which uses python libraries show charts and data about radio signals. https://learn.adafruit.com/freq-show-raspberry-pi-rtl-sdr-scanner/installation
 	- This was also helpful because it showed me how to get the drivers installed for the RTL-SDR device
 - rtl_433, which is a C program specifically designed to analyze device data on the 433mhz range.
 
@@ -43,7 +43,7 @@ Okay, but my receiver knows when it is open vs closed. How do I get that data? L
 
 rtl_433 to the rescue! At first, I was only able to see gibberish when using rtl_433 to analyze the pulses. There was nothing that would reliably differentiate the open vs closed states.
 
-So, I played with the sample rate. When I tested with 5000 Hz, I got what I needed. rtl_433 was able to decode the singles and I got some binary data! The key difference was the presence of `01100001` for the open single and `10000001` for the closed single. Now THAT is something that I can use.
+So, I played with the sample rate. When I tested with 5000 Hz, I got what I needed. rtl_433 was able to decode the signals and I got some binary data! The key difference was the presence of `01100001` for the open signal and `10000001` for the closed signal. Now THAT is something that I can use.
 
 Problem: I couldn't find a python library to get this data for me, and I didn't want to spend 50 years trying to build one myself.
 
