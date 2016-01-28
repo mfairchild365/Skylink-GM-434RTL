@@ -29,7 +29,7 @@ p.kill()
 closed_text = 'garage door is CLOSED'
 open_text = 'garage door is OPEN'
 
-cmd = 'rtl_433 2>&1 -s'+cfg.sample_rate+' -A -f '+cfg.frequency
+cmd = 'rtl_433 -s '+cfg.sample_rate+' -A -f '+cfg.frequency + ' -g '+cfg.gain+' 2>&1'
 
 print 'running command: ' + cmd
 
@@ -48,17 +48,21 @@ def sendEmail(msg_txt):
         smtp.sendmail(cfg.email_from, [cfg.email_to], msg.as_string())
 	smtp.quit()
 
+last_signal = ''
+
 while p.poll() is None:
 	out = p.stdout.readline()
 
-	if cfg.closed_code in out and time.time() > last_message+2:
+	if cfg.closed_code in out and time.time() > last_message+2 and last_signal != cfg.closed_code:
 		print time.strftime('%c') + ': CLOSED'
                 sendEmail(closed_text)
 		last_message = time.time()
-	elif cfg.open_code in out and time.time() > last_message+2:
+		last_signal = cfg.closed_code
+	elif cfg.open_code in out and time.time() > last_message+2 and last_signal != cfg.open_code:
 		print time.strftime('%c') + ': OPEN'
 		sendEmail(open_text)
 		last_message = time.time()
+		last_signal = cfg.open_code
 
 print 'finished'
 
